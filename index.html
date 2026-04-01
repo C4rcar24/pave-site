@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PAVR — Navigate. Park. Never circle again.</title>
+<meta name="description" content="Navigate. Park. Never circle again. PAVR is Parking app with a brain. As you approach your destination, PAVR finds available parking through our sensors and reroutes you there automatically.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --teal: #2BBBA0;
+  --teal-d: #1A8C6E;
+  --blue: #4285F4;
+  --purple: #7B1FA2;
+  --red: #EA4335;
+  --dark: #0A0A0F;
+  --dark2: #12121A;
+  --dark3: #1A1A25;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--dark);
+  color: white;
+  overflow-x: hidden;
+}
+.container { max-width: 1140px; margin: 0 auto; padding: 0 24px; }
+.reveal { opacity: 0; transform: translateY(40px); transition: opacity .8s, transform .8s; }
+.reveal.vis { opacity: 1; transform: translateY(0); }
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 18px 0;
+  background: rgba(10,10,15,.7);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-bottom: 1px solid rgba(255,255,255,.04);
+}
+.nav-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  max-width: 1140px; margin: 0 auto; padding: 0 24px;
+}
+.nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.nav-mark {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--teal), var(--teal-d));
+  display: flex; align-items: center; justify-content: center;
+}
+.nav-name {
+  font-family: 'Outfit', sans-serif;
+  font-size: 22px; font-weight: 800; color: white; letter-spacing: 3px;
+}
+.nav-links { display: flex; gap: 32px; align-items: center; }
+.nav-links a {
+  color: rgba(255,255,255,.5); text-decoration: none; font-size: 14px;
+  font-weight: 500; transition: color .2s;
+}
+.nav-links a:hover { color: white; }
+.nav-cta {
+  padding: 10px 24px; border-radius: 24px; background: var(--teal);
+  color: white !important; font-weight: 700 !important; font-size: 13px !important;
+  transition: transform .2s, box-shadow .2s !important;
+}
+.nav-cta:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(43,187,160,.3); }
+@media(max-width:768px) { .nav-links { display: none; } }
+
+/* HERO */
+.hero {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+  padding: 120px 24px 80px;
+}
+.hero-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 800px 600px at 35% 40%, rgba(43,187,160,.07) 0%, transparent 70%),
+    radial-gradient(ellipse 600px 400px at 70% 60%, rgba(66,133,244,.05) 0%, transparent 70%),
+    radial-gradient(ellipse 400px 400px at 50% 80%, rgba(123,31,162,.04) 0%, transparent 70%);
+}
+.hero-grid-bg {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.015) 1px, transparent 1px);
+  background-size: 80px 80px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black, transparent);
+}
+.hero-content {
+  text-align: center; position: relative; z-index: 2;
+  max-width: 860px;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 20px; border-radius: 24px;
+  background: rgba(43,187,160,.08); border: 1px solid rgba(43,187,160,.15);
+  font-size: 13px; font-weight: 600; color: var(--teal);
+  margin-bottom: 32px;
+  animation: fadeDown .8s .2s both;
+}
+.hero-badge-dot {
+  width: 6px; height: 6px; border-radius: 3px; background: var(--teal);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:.3} }
+@keyframes fadeDown { from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:none} }
+@keyframes fadeUp { from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none} }
+
+.hero h1 {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(42px, 7vw, 76px);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -2px;
+  margin-bottom: 24px;
+  animation: fadeUp .8s .3s both;
+}
+.hero h1 .grad {
+  background: linear-gradient(135deg, var(--teal) 0%, var(--blue) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero p {
+  font-size: clamp(16px, 2vw, 20px);
+  color: rgba(255,255,255,.45);
+  line-height: 1.7;
+  max-width: 640px;
+  margin: 0 auto 40px;
+  animation: fadeUp .8s .5s both;
+}
+.hero-actions {
+  display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+  animation: fadeUp .8s .7s both;
+}
+.btn-primary {
+  padding: 16px 36px; border-radius: 30px; border: none;
+  background: var(--teal); color: white;
+  font-size: 16px; font-weight: 700; cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: transform .2s, box-shadow .2s;
+  text-decoration: none;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(43,187,160,.3); }
+.btn-secondary {
+  padding: 16px 36px; border-radius: 30px;
+  border: 1.5px solid rgba(255,255,255,.12); background: transparent;
+  color: white; font-size: 16px; font-weight: 600; cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: border-color .2s, background .2s;
+  text-decoration: none;
+}
+.btn-secondary:hover { border-color: rgba(255,255,255,.25); background: rgba(255,255,255,.03); }
+
+/* SHOWCASE */
+.showcase {
+  padding: 40px 0 120px;
+  display: flex; justify-content: center;
+  position: relative;
+}
+.showcase-glow {
+  position: absolute; top: -100px; left: 50%; transform: translateX(-50%);
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(43,187,160,.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+.phone-frame {
+  width: 300px; height: 620px;
+  background: var(--dark3);
+  border-radius: 44px;
+  border: 3px solid #2C2C2E;
+  overflow: hidden;
+  position: relative;
+  box-shadow:
+    0 30px 80px rgba(0,0,0,.5),
+    0 0 0 1px rgba(255,255,255,.04),
+    inset 0 0 0 1px rgba(255,255,255,.02);
+  animation: fadeUp 1s .4s both;
+}
+.phone-notch {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 130px; height: 30px;
+  background: var(--dark3);
+  border-radius: 0 0 18px 18px;
+  z-index: 10;
+}
+.phone-img {
+  width: 100%; height: 100%;
+  background: #E8E4DB;
+  position: relative; overflow: hidden;
+}
+.pm-streets { position: absolute; inset: 0; }
+.pm-s { position: absolute; background: white; border-radius: 1px; }
+.pm-s.h { height: 3px; }
+.pm-s.v { width: 3px; }
+.pm-g { background: #2BBBA0 !important; height: 5px !important; opacity: .7; border-radius: 2px; }
+.pm-r { background: #EA4335 !important; height: 5px !important; opacity: .6; border-radius: 2px; }
+.pm-search {
+  position: absolute; top: 38px; left: 14px; right: 14px; height: 40px;
+  background: white; border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+  display: flex; align-items: center; padding: 0 16px; z-index: 5;
+  font-size: 12px; color: #8E8E93; font-family: 'DM Sans', sans-serif;
+}
+.pm-route { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 3; }
+.pm-user {
+  position: absolute; width: 14px; height: 14px; border-radius: 7px;
+  background: #4285F4; border: 3px solid white;
+  box-shadow: 0 0 0 2px rgba(66,133,244,.2); z-index: 4;
+}
+.pm-pin { position: absolute; z-index: 5; }
+.pm-sheet {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: white; border-radius: 14px 14px 0 0;
+  padding: 10px 16px 16px;
+  box-shadow: 0 -2px 12px rgba(0,0,0,.06); z-index: 6;
+}
+.pm-handle { width: 30px; height: 3px; background: #D1D1D6; border-radius: 2px; margin: 0 auto 8px; }
+.pm-title { font-size: 13px; font-weight: 700; color: #1C1C1E; font-family: 'DM Sans', sans-serif; }
+.pm-sub { font-size: 9px; color: #8E8E93; margin-top: 2px; font-family: 'DM Sans', sans-serif; }
+.pm-btn {
+  margin-top: 8px; padding: 8px; border-radius: 8px; background: var(--teal);
+  text-align: center; font-size: 11px; font-weight: 700; color: white;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* GENERIC SECTIONS */
+.features, .how, .stats, .waitlist-section { padding: 100px 0; }
+.section-label {
+  font-size: 13px; font-weight: 700; color: var(--teal);
+  letter-spacing: 3px; text-transform: uppercase;
+  text-align: center; margin-bottom: 16px;
+}
+.section-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(32px, 5vw, 48px);
+  font-weight: 800; text-align: center;
+  letter-spacing: -1px; margin-bottom: 16px;
+}
+.section-desc {
+  font-size: 17px; color: rgba(255,255,255,.4);
+  text-align: center; max-width: 620px; margin: 0 auto 64px; line-height: 1.7;
+}
+.feat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+.feat-card, .waitlist-card, .contact-card {
+  background: var(--dark2);
+  border: 1px solid rgba(255,255,255,.04);
+  border-radius: 20px;
+  padding: 36px 32px;
+  transition: border-color .3s, transform .3s;
+}
+.feat-card:hover, .waitlist-card:hover, .contact-card:hover {
+  border-color: rgba(43,187,160,.15);
+  transform: translateY(-4px);
+}
+.feat-icon {
+  width: 48px; height: 48px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 20px;
+}
+.feat-card h3, .waitlist-card h3, .contact-card h3 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 20px; font-weight: 700; margin-bottom: 10px;
+}
+.feat-card p, .waitlist-card p, .contact-card p {
+  font-size: 14px; color: rgba(255,255,255,.4); line-height: 1.7;
+}
+
+/* HOW IT WORKS */
+.how { position: relative; }
+.how-bg {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent, var(--dark2) 30%, var(--dark2) 70%, transparent);
+}
+.steps-grid {
+  display: grid; grid-template-columns: repeat(4, minmax(0,1fr));
+  gap: 32px; position: relative; z-index: 2;
+}
+.step { text-align: center; padding: 32px 20px; }
+.step-num {
+  font-family: 'Outfit', sans-serif;
+  font-size: 64px; font-weight: 900;
+  color: rgba(43,187,160,.85);
+  letter-spacing: -2px;
+  line-height: 1; margin-bottom: 20px;
+}
+.step h3 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 20px; font-weight: 700; margin-bottom: 10px;
+}
+.step p {
+  font-size: 14px; color: rgba(255,255,255,.4); line-height: 1.7;
+}
+
+/* STATS */
+.stats-grid {
+  display: grid; grid-template-columns: repeat(4, minmax(0,1fr));
+  gap: 24px; text-align: center;
+}
+.stat-num {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(36px, 5vw, 56px);
+  font-weight: 900; color: var(--teal);
+  letter-spacing: -2px;
+}
+.stat-label {
+  font-size: 14px; color: rgba(255,255,255,.35);
+  margin-top: 4px; font-weight: 500;
+}
+
+.split-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+form { margin-top: 24px; display: grid; gap: 14px; }
+label {
+  display: block;
+  font-size: 13px;
+  color: rgba(255,255,255,.55);
+  margin-bottom: 6px;
+}
+input, select, textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.03);
+  color: white;
+  font: inherit;
+  outline: none;
+}
+textarea { min-height: 110px; resize: vertical; }
+input::placeholder, textarea::placeholder { color: rgba(255,255,255,.25); }
+.fine {
+  font-size: 12px;
+  color: rgba(255,255,255,.28);
+  line-height: 1.6;
+}
+.success {
+  display: none;
+  margin-top: 10px;
+  background: rgba(43,187,160,.10);
+  border: 1px solid rgba(43,187,160,.22);
+  color: #7ae8d3;
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-size: 14px;
+}
+
+.cta {
+  padding: 120px 0;
+  text-align: center;
+  position: relative;
+}
+.cta-glow {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 700px; height: 400px;
+  background: radial-gradient(circle, rgba(43,187,160,.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+.cta h2 {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(32px, 5vw, 52px);
+  font-weight: 900; letter-spacing: -1px;
+  margin-bottom: 16px; position: relative; z-index: 2;
+}
+.cta p {
+  font-size: 18px; color: rgba(255,255,255,.4);
+  margin-bottom: 40px; position: relative; z-index: 2;
+}
+
+footer { padding: 40px 0; border-top: 1px solid rgba(255,255,255,.04); }
+.footer-inner {
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 16px;
+}
+.footer-logo { display: flex; align-items: center; gap: 8px; }
+.footer-mark {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: linear-gradient(135deg, var(--teal), var(--teal-d));
+  display: flex; align-items: center; justify-content: center;
+}
+.footer-name {
+  font-family: 'Outfit', sans-serif;
+  font-size: 16px; font-weight: 700; letter-spacing: 2px;
+}
+.footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
+.footer-links a {
+  color: rgba(255,255,255,.3); text-decoration: none; font-size: 13px;
+  transition: color .2s;
+}
+.footer-links a:hover { color: rgba(255,255,255,.6); }
+.footer-copy {
+  font-size: 12px; color: rgba(255,255,255,.15);
+  text-align: center; margin-top: 32px;
+}
+
+@media(max-width: 900px) {
+  .split-grid, .steps-grid, .stats-grid { grid-template-columns: 1fr 1fr; }
+}
+@media(max-width: 768px) {
+  .hero { padding-top: 110px; }
+  .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
+  .phone-frame { width: 280px; height: 580px; }
+  .steps-grid, .stats-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <div class="nav-mark"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="white"/><circle cx="12" cy="9" r="3" fill="#2BBBA0"/></svg></div>
+      <span class="nav-name">PAVR</span>
+    </a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#mission">Our Mission</a>
+      <a href="#how">How it works</a>
+      <a href="#stats">Data</a>
+      <a href="#waitlist">Waitlist</a>
+      <a href="#waitlist" class="nav-cta">Join waitlist</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid-bg"></div>
+  <div class="hero-content">
+    <div class="hero-badge"><div class="hero-badge-dot"></div> Now live in San Francisco</div>
+    <h1>Navigate. Park.<br><span class="grad">Never circle again.</span></h1>
+    <p>PAVR is Parking app with a brain. As you approach your destination, PAVR finds available parking through our sensors and reroutes you there automatically.</p>
+    <div class="hero-actions">
+      <a href="#waitlist" class="btn-primary">Join waitlist</a>
+      <a href="#features" class="btn-secondary">See how it works</a>
+    </div>
+  </div>
+</section>
+
+<section class="showcase">
+  <div class="showcase-glow"></div>
+  <div class="phone-frame">
+    <div class="phone-notch"></div>
+    <div class="phone-img">
+      <div class="pm-streets">
+        <div class="pm-s h" style="top:130px;left:20px;width:260px"></div>
+        <div class="pm-s h" style="top:175px;left:10px;width:280px"></div>
+        <div class="pm-s h" style="top:220px;left:25px;width:250px"></div>
+        <div class="pm-s h" style="top:265px;left:15px;width:270px"></div>
+        <div class="pm-s h" style="top:310px;left:20px;width:260px"></div>
+        <div class="pm-s h" style="top:355px;left:10px;width:280px"></div>
+        <div class="pm-s v" style="top:110px;left:65px;height:280px"></div>
+        <div class="pm-s v" style="top:110px;left:130px;height:280px"></div>
+        <div class="pm-s v" style="top:110px;left:195px;height:280px"></div>
+        <div class="pm-s v" style="top:110px;left:245px;height:280px"></div>
+        <div class="pm-s pm-g" style="top:128px;left:67px;width:60px"></div>
+        <div class="pm-s pm-g" style="top:173px;left:132px;width:60px"></div>
+        <div class="pm-s pm-r" style="top:173px;left:67px;width:60px"></div>
+        <div class="pm-s pm-g" style="top:218px;left:67px;width:60px"></div>
+        <div class="pm-s pm-g" style="top:263px;left:197px;width:46px"></div>
+        <div class="pm-s pm-r" style="top:308px;left:132px;width:60px"></div>
+        <div class="pm-s pm-g" style="top:353px;left:67px;width:60px"></div>
+        <div class="pm-s pm-g" style="top:263px;left:67px;width:60px"></div>
+      </div>
+      <svg class="pm-route">
+        <path d="M150 430 L150 310 L100 310 L100 220 L150 220 L150 150 L210 150 L210 110"
+              stroke="#4285F4" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/>
+      </svg>
+      <div class="pm-user" style="top:423px;left:143px"></div>
+      <svg class="pm-pin" style="top:92px;left:202px" width="20" height="20" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#EA4335"/><circle cx="12" cy="9" r="2.5" fill="white"/></svg>
+      <div style="position:absolute;top:140px;left:200px;width:18px;height:18px;border-radius:5px;background:#7B1FA2;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:white;z-index:5;box-shadow:0 2px 6px rgba(123,31,162,.3)">P</div>
+      <div class="pm-search">
+        <svg width="12" height="12" viewBox="0 0 24 24" style="flex-shrink:0;margin-right:8px;opacity:.4"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="#8E8E93" stroke-width="2.5" fill="none"/></svg>
+        Search PAVR
+      </div>
+      <div class="pm-sheet">
+        <div class="pm-handle"></div>
+        <div class="pm-title">MARKET ST</div>
+        <div class="pm-sub">Financial District · $7.00/hr · 12 meters</div>
+        <div style="font-size:9px;color:#2BBBA0;font-weight:600;margin-top:3px;font-family:'DM Sans',sans-serif">Allowed until 6:00 PM</div>
+        <div class="pm-btn">Navigate here</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="features" id="features">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Features</div>
+      <div class="section-title">Everything you need to park</div>
+      <div class="section-desc">Parking intelligence, sensor-powered availability, and smart rerouting in one app.</div>
+    </div>
+    <div class="feat-grid">
+      <div class="feat-card reveal">
+        <div class="feat-icon" style="background:rgba(43,187,160,.1)"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="none" stroke="#2BBBA0" stroke-width="1.8"/><circle cx="12" cy="9" r="2.5" fill="#2BBBA0"/></svg></div>
+        <h3>Destination-based suggestions</h3>
+        <p>PAVR shows the nearest and most relevant parking options close to where the user is actually going.</p>
+      </div>
+      <div class="feat-card reveal">
+        <div class="feat-icon" style="background:rgba(66,133,244,.1)"><svg width="24" height="24" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="3" fill="none" stroke="#4285F4" stroke-width="1.8"/><circle cx="9" cy="12" r="1.6" fill="#4285F4"/><circle cx="15" cy="12" r="1.6" fill="#4285F4"/></svg></div>
+        <h3>Sensor-powered availability</h3>
+        <p>Our sensors detect whether supported parking spaces are occupied or open and feed that data into PAVR in real time.</p>
+      </div>
+      <div class="feat-card reveal">
+        <div class="feat-icon" style="background:rgba(234,67,53,.1)"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M3 11l19-9-9 19-2-8-8-2z" fill="none" stroke="#EA4335" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+        <h3>Automatic rerouting</h3>
+        <p>As drivers approach their destination, PAVR can reroute them to the best nearby available parking option instead of letting them circle.</p>
+      </div>
+      <div class="feat-card reveal">
+        <div class="feat-icon" style="background:rgba(123,31,162,.1)"><svg width="24" height="24" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="#7B1FA2" stroke-width="1.8"/><text x="12" y="16" text-anchor="middle" font-size="12" font-weight="700" fill="#7B1FA2">P</text></svg></div>
+        <h3>Legal parking guidance</h3>
+        <p>PAVR helps users understand whether a space is allowed, how long they can stay, and when they may need to move.</p>
+      </div>
+      <div class="feat-card reveal">
+        <div class="feat-icon" style="background:rgba(255,149,0,.1)"><svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="#FF9500" stroke-width="1.8"/><polyline points="12 6 12 12 16 14" fill="none" stroke="#FF9500" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        <h3>Before-arrival parking intelligence</h3>
+        <p>PAVR activates before users arrive so they can decide sooner based on distance, availability, and convenience.</p>
+      </div>
+      <div class="feat-card reveal">
+        <div class="feat-icon" style="background:rgba(43,187,160,.1)"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" fill="none" stroke="#2BBBA0" stroke-width="1.8"/><circle cx="12" cy="12" r="3" fill="#2BBBA0"/></svg></div>
+        <h3>Operator visibility</h3>
+        <p>Parking operators and pilot partners can use PAVR to understand space activity and improve parking visibility for drivers.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="features" id="mission" style="padding-top:40px;">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Our Mission</div>
+      <div class="section-title">Making parking faster, smarter, and less frustrating.</div>
+      <div class="section-desc">PAVR exists to help drivers stop wasting time circling for parking and start making better parking decisions before they arrive.</div>
+    </div>
+    <div class="split-grid">
+      <div class="waitlist-card reveal">
+        <h3>Why PAVR exists</h3>
+        <p>Parking is one of the most frustrating parts of driving. People lose time, burn gas, miss appointments, and risk tickets simply because they do not know where parking is actually available. PAVR was built to change that.</p>
+        <p style="margin-top:14px;">Our mission is to make parking more visible, more efficient, and easier to understand by combining destination-based guidance, sensor-powered availability, and smart rerouting into one experience.</p>
+      </div>
+      <div class="contact-card reveal">
+        <h3>What we want to change</h3>
+        <p>PAVR is designed to reduce circling, improve parking visibility, and help drivers reach their destination with less stress. We want to make cities easier to navigate, help operators better understand their parking activity, and create a smarter parking experience for everyone.</p>
+        <p style="margin-top:14px;">As PAVR expands, our goal is to bring this experience to more supported lots, garages, curb zones, campuses, and cities.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="how" id="how">
+  <div class="how-bg"></div>
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">How it works</div>
+      <div class="section-title">Park in 4 steps</div>
+      <div class="section-desc">From destination to parked, one seamless flow.</div>
+    </div>
+    <div class="steps-grid">
+      <div class="step reveal">
+        <div class="step-num">01</div>
+        <h3>Search destination</h3>
+        <p>Type where you're going and let PAVR prepare nearby parking options before arrival.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">02</div>
+        <h3>Approach your destination</h3>
+        <p>As you get closer, PAVR checks supported areas and evaluates nearby parking opportunities.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">03</div>
+        <h3>Sensors find parking</h3>
+        <p>PAVR uses sensor-powered availability to detect open spaces and identify the best nearby option.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">04</div>
+        <h3>Park and go</h3>
+        <p>Get routed to the space, park faster, and head to your destination without circling around the block.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="stats" id="stats">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="reveal">
+        <div class="stat-num">Real-time</div>
+        <div class="stat-label">Sensor availability updates</div>
+      </div>
+      <div class="reveal">
+        <div class="stat-num">Faster</div>
+        <div class="stat-label">Parking decisions near arrival</div>
+      </div>
+      <div class="reveal">
+        <div class="stat-num">Smarter</div>
+        <div class="stat-label">Destination-based parking guidance</div>
+      </div>
+      <div class="reveal">
+        <div class="stat-num">24/7</div>
+        <div class="stat-label">Parking visibility in supported areas</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="waitlist-section" id="waitlist">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Waitlist</div>
+      <div class="section-title">Join PAVR early</div>
+      <div class="section-desc">Get launch updates, pilot news, and early access as PAVR expands into more supported areas.</div>
+    </div>
+    <div class="split-grid">
+      <div class="waitlist-card reveal">
+        <h3>Waitlist signup</h3>
+        <p>Be first to know when PAVR opens new pilot areas and launches early access for drivers, property owners, and partners.</p>
+        <form id="waitlistForm">
+          <div>
+            <label for="name">Name</label>
+            <input id="name" name="name" placeholder="Your name" required>
+          </div>
+          <div>
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" placeholder="you@example.com" required>
+          </div>
+          <div>
+            <label for="city">City</label>
+            <input id="city" name="city" placeholder="San Francisco">
+          </div>
+          <div>
+            <label for="interest">I’m interested as a...</label>
+            <select id="interest" name="interest">
+              <option value="Driver">Driver</option>
+              <option value="Operator / Property Partner">Operator / Property Partner</option>
+              <option value="Investor">Investor</option>
+              <option value="General Supporter">General Supporter</option>
+            </select>
+          </div>
+          <button class="btn-primary" type="submit">Join waitlist</button>
+          <div class="fine">Demo version: submissions are stored locally in your browser only. Connect this form to Formspree, Firebase, Supabase, Airtable, or Mailchimp for live signups.</div>
+          <div class="success" id="waitlistSuccess">You’re on the PAVR waitlist in this demo browser.</div>
+        </form>
+      </div>
+
+      <div class="contact-card reveal" id="contact">
+        <h3>Contact</h3>
+        <p>Want to talk about a pilot, partnership, or early deployment opportunity for PAVR?</p>
+        <p style="margin-top:14px; color:white;"><strong>Email:</strong> <a href="mailto:pavr@pavrapp.com">pavr@pavrapp.com</a></p>
+        <form id="contactForm">
+          <div>
+            <label for="contactName">Name</label>
+            <input id="contactName" name="name" placeholder="Your name" required>
+          </div>
+          <div>
+            <label for="contactEmail">Email</label>
+            <input id="contactEmail" name="email" type="email" placeholder="you@example.com" required>
+          </div>
+          <div>
+            <label for="contactMessage">Message</label>
+            <textarea id="contactMessage" name="message" placeholder="Tell us about your parking site, property, or pilot interest."></textarea>
+          </div>
+          <button class="btn-secondary" type="submit">Send interest</button>
+          <div class="success" id="contactSuccess">Your message was saved in this browser for demo purposes.</div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta" id="cta">
+  <div class="cta-glow"></div>
+  <div class="container reveal">
+    <h2>Stop circling. Start parking.</h2>
+    <p>PAVR helps drivers make smarter parking decisions before they arrive.</p>
+    <div class="hero-actions">
+      <a href="#waitlist" class="btn-primary">Join the waitlist</a>
+      <a href="mailto:pavr@pavrapp.com" class="btn-secondary">Contact PAVR</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-logo">
+        <div class="footer-mark"><svg width="16" height="16" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="white"/><circle cx="12" cy="9" r="3" fill="#2BBBA0"/></svg></div>
+        <span class="footer-name">PAVR</span>
+      </div>
+      <div class="footer-links">
+        <a href="#features">Features</a>
+        <a href="#mission">Our Mission</a>
+        <a href="#how">How it works</a>
+        <a href="#waitlist">Waitlist</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </div>
+    <div class="footer-copy">Built for San Francisco. Powered by Mapbox + SF Open Data.</div>
+  </div>
+</footer>
+
+<script>
+var reveals = document.querySelectorAll('.reveal');
+var observer = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('vis');
+    }
+  });
+}, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+reveals.forEach(function(el) { observer.observe(el); });
+
+function saveForm(formId, storageKey, successId) {
+  var form = document.getElementById(formId);
+  var success = document.getElementById(successId);
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var data = Object.fromEntries(new FormData(form).entries());
+    var existing = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    existing.push(Object.assign({}, data, { submittedAt: new Date().toISOString() }));
+    localStorage.setItem(storageKey, JSON.stringify(existing));
+    form.reset();
+    success.style.display = 'block';
+    setTimeout(function(){ success.style.display = 'none'; }, 3500);
+  });
+}
+saveForm('waitlistForm', 'pavr_waitlist_demo', 'waitlistSuccess');
+saveForm('contactForm', 'pavr_contact_interest_demo', 'contactSuccess');
+</script>
+</body>
+</html>
